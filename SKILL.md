@@ -14,7 +14,10 @@ Use this skill to build a complete standalone Helios web visualization, not just
    - General network layout: read `references/helios-api-recipes.md`.
    - Netzschleuder or `.gt.zst`: read `references/netzschleuder.md`.
    - Rich UI with panels, filters, hover cards, density, or search: read `references/interface-and-design.md`.
-2. Start from `assets/vite-standalone-template/` for a fresh app unless the user supplied an existing app.
+2. Choose the starter:
+   - Use `assets/vite-standalone-template/` for a small static visualization or a smoke-test app.
+   - Use `assets/analytics-interface-template/` when the app needs search, filters, multiple panels, quick controls, density toggles, or a richer analytical interface.
+   - Copy selected helpers from `assets/interface-snippets/` when adapting an existing app.
 3. If exact Helios behavior is unclear, clone the current `helios-web` main branch into a scratch reference directory:
 
 ```bash
@@ -54,6 +57,15 @@ cd /tmp/my-helios-viz
 npm install
 npm run build
 npm run dev
+```
+
+For a richer app, copy the analytics template:
+
+```bash
+cp -R assets/analytics-interface-template /tmp/my-analytics-viz
+cd /tmp/my-analytics-viz
+npm install
+npm run build
 ```
 
 ## Core Vite Setup
@@ -96,6 +108,7 @@ When using WASM-backed buffers, do allocation-prone work before taking views and
 - General graph apps: use `layout: { type: 'gpu-force', options: { mode: '2d' or '3d' } }`; avoid pinning renderer unless the task requires WebGPU-only behavior.
 - Large remote networks: confirm before loading very large files, use modest node/edge opacity, disable expensive labels by default, and expose controls gradually.
 - Rich analytic maps: use density surfaces, categorical legends, range controls, and search/filter panels. Keep the canvas full-screen and panels compact.
+- Relationship-heavy or multiplex apps: use collapsed filter sections, edge relationship checklists, quick fit/pause/info controls, and separate "show/hide" from "emphasize" controls so users can inspect edge families without constantly rebuilding layout state.
 
 ## UI Defaults
 
@@ -108,6 +121,8 @@ Standalone apps should feel like tools:
 - Avoid landing pages. The first screen should be the visualization.
 
 See `references/interface-and-design.md` for reusable UI patterns and CSS notes from the existing standalone apps.
+
+Copy `assets/interface-snippets/controls.js` and `assets/interface-snippets/standalone-ui.css` when the app needs the control patterns directly. The snippets are deliberately app-neutral but are based on the control surfaces in `funding_viz`, `luddy_viz`, and `multiplex_notable_viz`.
 
 ## Verification
 
@@ -142,6 +157,9 @@ Then inspect with a browser, confirm the canvas is nonblank, confirm the status 
 - `references/netzschleuder.md`: remote API, Vite proxy, `.gt.zst`, large-network guards.
 - `references/case-notes.md`: discoveries from `standalone_visualizations_helios_web_0_10_6`.
 - `references/verification.md`: build, browser checks, troubleshooting.
+- `assets/interface-snippets/`: self-contained DOM/CSS helpers for rich standalone panels.
+- `assets/scripts/`: small data conversion wrappers for XNET, ZXNET, and multiplex CSV payloads.
+- `assets/analytics-interface-template/`: richer self-contained Vite starter with browser/filter/view panels.
 
 ## Completion Checklist
 

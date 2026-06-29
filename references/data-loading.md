@@ -75,6 +75,20 @@ async function loadRawXnetJson(url) {
 }
 ```
 
+The skill includes a small copy-ready converter:
+
+```bash
+node assets/scripts/convert-xnet-to-json.mjs network/input.xnet public/network/input.network.json
+```
+
+Copy that script into an app's `scripts/` folder when the app should ship a JSON-wrapped XNET payload instead of importing `.xnet` directly.
+
+To wrap an existing binary `.zxnet` file for static hosting:
+
+```bash
+node assets/scripts/wrap-zxnet-file-as-json.mjs network/input.zxnet public/network/input.network.json
+```
+
 ## Programmatic Demo Data
 
 Use this for examples and tests without external data:
@@ -88,6 +102,21 @@ network.nodeAttribute('Group', (_value, id) => (id % 3 === 0 ? 'Alpha' : id % 3 
   type: AttributeType.String,
 });
 ```
+
+## Multiplex CSV Template
+
+For relationship-heavy apps like the multiplex reference, a practical intermediate format is:
+
+- `nodes.csv`: `id,label,x,y,category,size`
+- `edges.csv`: `source,target,relationship,weight`
+
+The skill includes a self-contained CSV converter:
+
+```bash
+node assets/scripts/convert-multiplex-csv-to-network-json.mjs data/nodes.csv data/edges.csv public/network/multiplex.network.json
+```
+
+The converter writes a `standalone-network-json` payload with deterministic node ids, edge relationship labels, category counts, and relationship counts. Treat it as a starting point: most real apps will extend it with domain-specific node attributes, edge attributes, and color/legend metadata.
 
 ## Coordinate Attributes
 

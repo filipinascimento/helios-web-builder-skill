@@ -109,6 +109,16 @@ Use native controls styled with Helios UI classes:
 
 For sliders, pair range and numeric input so exact values can be entered. Throttle high-frequency updates with `createFpsThrottle()`.
 
+The skill includes copy-ready helpers in `assets/interface-snippets/controls.js` and `assets/interface-snippets/standalone-ui.css`. Use those helpers when the app needs several control families quickly:
+
+- `createSliderField()` and `createLogSliderField()` for density bandwidth, opacity, edge width, and z-score/log-ratio scales.
+- `createRangeField()` for year or numeric filters.
+- `createSelectField()` and `createSegmentedField()` for color mode, density mode, and projection/layout choices.
+- `createChecklistField()` and `createCollapsedSection()` for category filters with many values.
+- `createRelationshipChecklist()` for multiplex edge families where "visible" and "emphasized" are separate actions.
+- `createSearchField()` for label/faculty/paper/dataset search.
+- `createHoverCard()`, `createQuickControls()`, and `createInfoPanel()` for canvas-adjacent interaction.
+
 ## Hover Card
 
 Use a small absolute card for metadata:
@@ -142,6 +152,78 @@ For large catalogues, use a single keyboard-navigable combobox instead of separa
 
 This pattern was used for the Netzschleuder app to keep dataset selection compact and keyboard-accessible.
 
+## Reference App Patterns
+
+These patterns came from the existing standalone apps and should be reused when they fit the data.
+
+### Funding-Style Density Explorer
+
+Use this for analytic embeddings where the main product is a density surface, log odds surface, numerator/denominator comparison, or z-score field.
+
+- First screen: full-canvas view with a compact top-left explanation/welcome shell and a top-right control cluster.
+- Controls: segmented density/log-odds mode; select fields for numerator and denominator; log sliders for bandwidth, epsilon, and display range; checkboxes for z-score or signed transforms.
+- Filters: year range, categorical checklists, search attribute select, and free-text search.
+- Hover: bottom-left card with the selected entity and compact metadata rows.
+- Good default: keep density disabled or conservative until the scene is ready; expose the expensive controls only after load.
+
+Implementation notes:
+
+```js
+const surfaceMode = createSegmentedField({
+  label: 'Surface',
+  value: 'density',
+  options: [
+    { value: 'density', label: 'Density' },
+    { value: 'logOdds', label: 'Log odds' },
+  ],
+  onChange: (mode) => applyDensityMode(mode),
+});
+
+const bandwidth = createLogSliderField({
+  label: 'Bandwidth',
+  value: 0.045,
+  min: 0.004,
+  max: 0.24,
+  onInput: (value) => helios.density?.({ enabled: true, bandwidth: value }),
+});
+```
+
+### Luddy-Style Author or Entity Explorer
+
+Use this for embedding maps centered around people, papers, institutions, or other entities where search and highlighted subsets matter.
+
+- Browser panel: search input plus checklist or multi-select for target entities.
+- Filter panel: text search, year range, type select, and department/category checklist.
+- View panel: color mode, density mode, node size, node opacity, label zoom, and semantic zoom.
+- Behavior: search should highlight or increase opacity for matching entities instead of navigating away from the canvas.
+- Good default: density can represent the selected/highlighted subset rather than the whole graph.
+
+### Multiplex Relationship Browser
+
+Use this for multigraphs, knowledge graphs, or schema-rich networks with many edge types and long categorical filters.
+
+- Quick controls: small square buttons near the canvas edge for help/info, fit, pause/resume layout, and density toggles.
+- Relationship checklist: show counts, swatches, "All"/"None", a separate eye button for edge visibility, and row click for emphasis.
+- Filters: use collapsed sections for long category lists so the panel remains usable on laptop screens.
+- Metadata: small info popover with node/edge counts, source, layout, and current filters.
+- Good default: hide or fade low-priority edge families instead of removing them from the network object.
+
+Implementation notes:
+
+```js
+const relationshipControl = createRelationshipChecklist({
+  relationships: relationshipStats.map((item) => ({
+    value: item.id,
+    label: item.label,
+    count: item.edgeCount,
+    color: item.color,
+  })),
+  visible: new Set(relationshipStats.map((item) => item.id)),
+  onVisibleChange: (visible) => updateEdgeVisibility(visible),
+  onEmphasisChange: (emphasized) => updateRelationshipFocus(emphasized),
+});
+```
+
 ## Visual Tone
 
 Use quiet tool styling:
@@ -154,3 +236,24 @@ Use quiet tool styling:
 - Avoid text overlap by constraining panel heights and using `min-width: 0`, `overflow: hidden`, and `text-overflow: ellipsis`.
 
 Standalone examples used dark themes with restrained translucent panels. If the data needs inspection, avoid overly dark or low-contrast node/edge styling.
+
+## Responsive Constraints
+
+The reference apps work well because panels have fixed, modest widths and scroll internally:
+
+```js
+const panel = ui.createPanel({
+  id: 'filters',
+  title: 'Filters',
+  content,
+  dock: 'top-right',
+  position: { x: 16, y: 16 },
+  width: 320,
+  minWidth: 320,
+});
+panel.element.style.maxHeight = 'min(720px, calc(100vh - 32px))';
+panel.body.style.minHeight = '0';
+panel.body.style.overflow = 'auto';
+```
+
+Avoid free-growing sidebars. A standalone app is usually opened on unknown laptop, projector, and browser sizes, so controls must stay within the viewport without covering the whole canvas.

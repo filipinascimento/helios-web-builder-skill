@@ -71,6 +71,28 @@ README.md
 
 Put Vite-served public assets in `public/` when they should be available from `/...`. Put source or generated network payloads in `network/` or `public/network/` based on whether the app imports them through Vite (`../network/file.json?url`) or fetches them as public URLs (`/network/file.json`).
 
+## Starting From a Template
+
+Use the minimal template for a small static visualization:
+
+```bash
+node scripts/create-standalone-viz.mjs /tmp/my-helios-viz --name my-helios-viz --title "My Helios Viz"
+cd /tmp/my-helios-viz
+npm install
+npm run build
+```
+
+Use the analytics template when the app needs the richer standalone interface found in the reference visualizations:
+
+```bash
+cp -R assets/analytics-interface-template /tmp/my-analytics-viz
+cd /tmp/my-analytics-viz
+npm install
+npm run build
+```
+
+The analytics template is self-contained. It has its own `src/ui-controls.js`, generated demo network, search panel, filter panel, view panel, density quick toggle, fit quick button, and hover card.
+
 ## Reference Clone
 
 When behavior needs confirmation from current `helios-web`, clone main into a scratch directory:

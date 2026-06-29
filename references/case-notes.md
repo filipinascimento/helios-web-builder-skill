@@ -47,6 +47,16 @@ Key patterns:
 - Exposes density mode, numerator/denominator, z-score, bandwidth, epsilon, range, focus, node opacity, node size, semantic zoom, search, year, SDG, type, profile, and in-dimensions controls.
 - Uses `scaleWithZoom: false` for density so density interpretation remains stable during camera movement.
 
+Interface details:
+
+- `index.html` stays minimal: `#app` contains a full-window `#viewer`.
+- CSS uses a dark map-like background, restrained radial highlights, translucent panels, `backdrop-filter: blur(...)`, and IBM Plex/Avenir/Segoe style fonts.
+- The welcome overlay is full-screen and dismissible. Persist dismissal in local storage only for app-specific onboarding, not for critical warnings.
+- The hero/status shell is a compact top-left panel with stats chips and short app context.
+- The control surface is composed from small DOM helpers: `createSliderField`, `createLogSliderField`, `createRangeField`, `createSelectField`, `createSegmentedField`, `createCheckboxField`, and `createChecklistField`.
+- Density controls are grouped separately from view controls and filters. This keeps expensive analytic parameters away from ordinary opacity/color controls.
+- Hover cards stay bottom-left and show one entity at a time with rows, not paragraphs.
+
 ## Luddy App
 
 Purpose: static 2D author/publication embedding.
@@ -57,6 +67,14 @@ Key patterns:
 - Converts source XNET to base64 ZXNET JSON using `HeliosNetwork.fromXNet()` and `network.saveZXNet()`.
 - Uses static `Position` coordinates.
 - Adds faculty search, multi-faculty highlight, publication lists, year/type/paper/department filters, and selected-faculty density.
+
+Interface details:
+
+- The browser/search panel is the primary task surface. It prioritizes selecting faculty/entities over explaining the visualization.
+- The app uses search plus checklist-style subsets instead of a long landing page or a static legend.
+- Density has a "highlighted faculty" mode, which is a useful pattern for entity-centric embeddings: density should often summarize the selected subset, not the entire corpus.
+- Shared input styling targets Helios classes such as `.helios-ui-input`, `.helios-ui-select`, and `.helios-ui-number`, so native controls remain consistent with HeliosUI panels.
+- Help is a small popover anchored near the tool surface, not a modal that hides the graph.
 
 ## Philanthrophysics App
 
@@ -85,6 +103,22 @@ Key patterns:
 - Reheats layout after filter changes.
 - Offers auto-fit and layout restart controls.
 
+Interface details:
+
+- Quick controls are a small vertical stack of square buttons near the canvas edge for help/info, fit, and layout pause/restart.
+- Metadata lives in a compact info popover with counts and source details.
+- Relationship rows show swatches, counts, a label, and an eye button. The eye toggles edge visibility; clicking the row can emphasize a relationship without removing it.
+- Long category filters use collapsed sections with scrollable bodies. This prevents filter panels from consuming the whole viewport.
+- There are separate panels for color, size, relationships, filters, density, and appearance. Do this only when the dataset genuinely has that much structure.
+- Density controls include enable, bandwidth, log weight, and focus. Default density state should be conservative for large graphs.
+
+Conversion details:
+
+- The converter builds both network payload and metadata payloads, not just edges.
+- It normalizes categories and relationship labels before writing attributes.
+- It creates deterministic seeded initial positions so GPU-force layout starts consistently across reloads.
+- It records relationship/category counts for immediate UI controls without scanning the whole network on every boot.
+
 ## Netzschleuder App
 
 Purpose: live dataset browser for `networks.skewed.de`.
@@ -109,3 +143,7 @@ Key patterns:
 - For WASM buffers, use `withBufferAccess()` and do not hold typed-array views across allocation-prone calls.
 - Frame twice after startup for static embeddings to avoid timing-dependent first-frame bounds.
 - Expose only controls that matter for the dataset. A small app does not need all standard Helios panels.
+- Keep `#viewer` as the first screen. Do not create a marketing or explanatory landing page before the graph.
+- Put reusable domain conversion work in `scripts/` and expose it from `package.json`; do not leave ad hoc notebook or parent-directory dependencies as part of the standalone app.
+- Pair sliders with number inputs when exact values matter. Use log sliders for parameters such as bandwidth, epsilon, density range, and relationship weight.
+- For large or multiplex graphs, prefer opacity/visibility attributes and renderer filters over deleting data from the network object.
