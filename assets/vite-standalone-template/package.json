@@ -10,9 +10,9 @@
   },
   "dependencies": {
     "helios-network": "^0.10.3",
-    "helios-web": "^0.10.7"
+    "helios-web": "^0.10.9"
   },
   "devDependencies": {
-    "vite": "^5.4.10"
+    "vite": "^8.1.0"
   }
 }

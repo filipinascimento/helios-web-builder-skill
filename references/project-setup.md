@@ -4,7 +4,16 @@ Use this when creating or modernizing a standalone Helios app.
 
 ## Package Metadata
 
-Use ESM and keep the app private unless the user asks to publish it:
+Use ESM and keep the app private unless the user asks to publish it. Check current registry versions before finalizing new scaffolds:
+
+```bash
+npm view helios-web version
+npm view helios-network version
+npm view vite version
+npm view vite engines --json
+```
+
+As of the last skill update, current published versions were `helios-web@0.10.9`, `helios-network@0.10.3`, and `vite@8.1.0`. Vite 8 requires Node `^20.19.0 || >=22.12.0`; if the target environment must support Node 18, use a compatible Vite line instead.
 
 ```json
 {
@@ -19,15 +28,15 @@ Use ESM and keep the app private unless the user asks to publish it:
   },
   "dependencies": {
     "helios-network": "^0.10.3",
-    "helios-web": "^0.10.7"
+    "helios-web": "^0.10.9"
   },
   "devDependencies": {
-    "vite": "^5.4.10"
+    "vite": "^8.1.0"
   }
 }
 ```
 
-Use newer compatible package versions if the user wants latest packages, but check the registry first. Do not hard-code sibling checkout paths into package metadata for a standalone deliverable.
+Do not hard-code sibling checkout paths into package metadata for a standalone deliverable. Use local links only for a deliberate unpublished-Helios test.
 
 ## Vite Config
 
@@ -91,7 +100,7 @@ npm install
 npm run build
 ```
 
-The analytics template is self-contained. It has its own `src/ui-controls.js`, generated demo network, search panel, filter panel, view panel, density quick toggle, fit quick button, and hover card.
+The analytics template is self-contained. It has its own `src/ui-controls.js`, generated demo network, search panel, filter panel, view panel, density quick toggle, and hover card. It is not the right starting point for remote-query tools unless you remove the synthetic generated graph and start from an empty search state.
 
 ## Reference Clone
 
@@ -103,6 +112,13 @@ bash scripts/clone-helios-web-reference.sh /tmp/helios-web-reference
 
 Search there for runtime APIs, demos, CSS variables, and panel behavior. Keep generated apps self-contained; do not depend on that clone at runtime.
 
+Do this before overriding or recreating:
+
+- layout, layout backend, layout options, or layout scheduling
+- camera mode, projection, zoom/distance bounds, fit behavior, or renderer choice
+- quick controls, pause/resume, zoom, fit, and standard camera actions
+- filters, range controls, mappers, domains, panels, and persistence/session behavior
+
 ## README Content
 
 Every app README should include:
@@ -111,6 +127,8 @@ Every app README should include:
 - `npm install`, `npm run dev`, `npm run build`.
 - Conversion/preparation commands, if any.
 - Whether it uses a static embedding, GPU-force layout, density, filters, or remote API proxy.
+- Whether Helios defaults are preserved or which mode/projection/layout/storage defaults are intentionally overridden.
+- Download caps, progress, and cancellation behavior for remote-query apps.
 - Any browser restrictions, such as CORS proxy requirements or WebGPU expectations.
 
 ## Deployment

@@ -10,6 +10,7 @@ The skill includes:
 - a richer analytics-interface Vite template inspired by the existing funding, Luddy, and multiplex standalone apps
 - reusable DOM/CSS snippets for sliders, log sliders, range controls, segmented controls, checklist filters, relationship browsers, quick controls, info panels, and hover cards
 - small conversion scripts for XNET, ZXNET, and multiplex CSV-style payloads
+- remote-query app guidance for live API probing, visible download caps, progress, cancellation, and persistence-free startup
 - helper scripts for cloning the current `helios-web` reference repo and creating a starter app
 
 ## Install in Codex

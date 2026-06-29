@@ -227,8 +227,6 @@ function mountPanels(helios) {
 
 function mountQuickControls(helios) {
   const controls = el('div', { className: 'quick-controls' });
-  const fit = el('button', { className: 'quick-button', text: 'Fit', attrs: { type: 'button', title: 'Fit network', 'aria-label': 'Fit network' } });
-  fit.addEventListener('click', () => helios.requestFrameNetwork({ paddingPx: 150 }));
   const density = el('button', { className: 'quick-button', text: 'Den', attrs: { type: 'button', title: 'Toggle density', 'aria-label': 'Toggle density' } });
   density.addEventListener('click', () => {
     const active = density.dataset.active !== 'true';
@@ -236,7 +234,7 @@ function mountQuickControls(helios) {
     helios.density?.({ enabled: active, bandwidth: 0.045, weight: SCORE });
     helios.requestRender();
   });
-  controls.append(fit, density);
+  controls.append(density);
   viewer.append(controls);
 }
 
@@ -286,7 +284,13 @@ async function bootstrap() {
   const helios = new Helios(network, {
     container: viewer,
     ui: false,
-    quickControls: false,
+    quickControls: true,
+    storage: false,
+    session: false,
+    warnOnUnsavedChanges: false,
+    // This template demonstrates a fixed embedding, so static 2D is intentional.
+    // Remote-query and general graph-layout apps should preserve Helios defaults
+    // unless the user requests a mode/projection/layout override.
     mode: '2d',
     projection: 'orthographic',
     layout: { type: 'static' },

@@ -1,6 +1,29 @@
 # Helios API Recipes
 
-Use these recipes as starting points. Check the current `helios-web` source if a method signature appears to have changed.
+Use these recipes as starting points. Check the current `helios-web` source before overriding runtime defaults or recreating built-in behavior.
+
+## Preserve Defaults First
+
+For a normal graph app, start with the fewest options:
+
+```js
+const helios = new Helios(network, {
+  container: viewer,
+  storage: false,
+  session: false,
+  warnOnUnsavedChanges: false,
+});
+await helios.ready;
+```
+
+Only add `mode`, `projection`, `renderer`, `layout`, or layout options when:
+
+- the data has trusted fixed coordinates,
+- the user asked for a specific behavior,
+- a control exposes the choice to the user, or
+- the current `helios-web` source confirms the default is not appropriate.
+
+Use built-in quick controls, panels, filters, ranges, mapper/domain controls, and layout controls before writing custom UI for the same behavior.
 
 ## Static 2D Embedding
 
@@ -8,7 +31,11 @@ Use these recipes as starting points. Check the current `helios-web` source if a
 const helios = new Helios(network, {
   container: viewer,
   ui: false,
-  quickControls: false,
+  quickControls: true,
+  storage: false,
+  session: false,
+  warnOnUnsavedChanges: false,
+  // These overrides are intentional only for trusted fixed coordinates.
   mode: '2d',
   projection: 'orthographic',
   layout: { type: 'static' },
@@ -23,10 +50,11 @@ Use this for UMAP/t-SNE/embedding maps and any XNET with fixed coordinates.
 
 ## GPU-Force Network
 
+Prefer preserving Helios defaults first. Use this only when the user or current source inspection calls for explicit layout settings:
+
 ```js
 const helios = new Helios(network, {
   container: viewer,
-  ui: false,
   quickControls: true,
   mode: '3d',
   projection: 'perspective',
@@ -39,6 +67,7 @@ const helios = new Helios(network, {
   },
   storage: false,
   session: false,
+  warnOnUnsavedChanges: false,
 });
 await helios.ready;
 helios.startLayout?.();
@@ -86,6 +115,18 @@ function applyCategoryColors(helios, attributeName) {
   helios.nodeMapper.channel('color').from(attributeName).categorical(ids, palette).done();
   helios.edgeMapper.channel('color').from('@node.color').nodeToEdge().done();
   helios.requestRender();
+}
+```
+
+For labeled legends with many categories, do not map unlimited categories into a fixed palette. Order by frequency, keep only the palette capacity, and collapse the rest into a neutral `Other` category or leave them with a neutral fallback. This avoids repeating category colors with misleading labels.
+
+```js
+function selectTopCategories(categoryStats, limit = 18) {
+  const sorted = [...categoryStats].sort((a, b) => (b.count ?? 0) - (a.count ?? 0));
+  return {
+    kept: sorted.slice(0, limit),
+    other: sorted.slice(limit),
+  };
 }
 ```
 
@@ -145,7 +186,9 @@ helios.legends({
 
 ## Filters
 
-For current `helios-web`, either use `HeliosFilter` or behavior filter rules depending on the app complexity.
+For current `helios-web`, use built-in filter behavior/panels before implementing app-local filtering. This matters for connected-component size, render-only versus render+layout scope, and layout reheating.
+
+Either use `HeliosFilter` or behavior filter rules depending on the app complexity:
 
 ```js
 const filter = new HeliosFilter({
@@ -177,6 +220,8 @@ helios.requestRender();
 ```
 
 For layout-affecting filters, use `scope: 'render+layout'` and reheat the layout if the app uses GPU-force.
+
+Before composing native two-ended sliders, check whether `TwoHandleRange` or an exported Helios UI primitive already covers the range/domain interaction.
 
 ## Hover Cards and Labels
 
@@ -220,13 +265,9 @@ Use this for dataset browsers:
 await helios.replaceNetwork(network, {
   keepCamera: false,
   keepMappers: false,
-  layout: {
-    type: 'gpu-force',
-    options: { mode: '3d', layoutScheduling: 'auto' },
-  },
   frame: false,
   markNetworkDirty: false,
 });
 ```
 
-Then reapply scene mappers and call `frameNetwork`.
+Then reapply scene mappers and call `frameNetwork`. Add an explicit replacement `layout` only when the new data requires a non-default layout and the current `helios-web` source confirms the option shape.

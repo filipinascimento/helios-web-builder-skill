@@ -97,6 +97,24 @@ panel.body.style.minHeight = '0';
 panel.body.style.overflow = 'hidden';
 ```
 
+## Built-In First
+
+Before creating custom controls, inspect the current `helios-web` source clone for existing controls and panels:
+
+```bash
+bash scripts/clone-helios-web-reference.sh /tmp/helios-web-reference
+rg -n "TwoHandleRange|Filter|Mapper|Domain|Quick|Panel|Range" /tmp/helios-web-reference/src
+```
+
+Use built-in controls for standard behaviors when available:
+
+- fit, zoom, pause/resume, and layout actions
+- render-only versus render+layout filters
+- two-handle numeric ranges and domain editors
+- mapper controls, color/domain controls, and standard Helios panels
+
+Custom DOM controls are appropriate for domain-specific search, remote download caps, cancellation, relationship-specific visibility, custom hover metadata, and specialized density comparisons that the built-ins do not expose.
+
 ## Controls
 
 Use native controls styled with Helios UI classes:
@@ -109,7 +127,7 @@ Use native controls styled with Helios UI classes:
 
 For sliders, pair range and numeric input so exact values can be entered. Throttle high-frequency updates with `createFpsThrottle()`.
 
-The skill includes copy-ready helpers in `assets/interface-snippets/controls.js` and `assets/interface-snippets/standalone-ui.css`. Use those helpers when the app needs several control families quickly:
+The skill includes copy-ready helpers in `assets/interface-snippets/controls.js` and `assets/interface-snippets/standalone-ui.css`. Use those helpers when built-in Helios UI primitives do not cover the interaction:
 
 - `createSliderField()` and `createLogSliderField()` for density bandwidth, opacity, edge width, and z-score/log-ratio scales.
 - `createRangeField()` for year or numeric filters.

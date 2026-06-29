@@ -12,3 +12,5 @@ npm run dev
 ```
 
 Then replace `createDemoNetwork()` in `src/main.js` with the app's loader or converter output.
+
+This template uses intentionally fixed generated coordinates to demonstrate the interface. For remote-query tools, remove the synthetic starter graph and show an empty ready/search state. For standard graph layouts, preserve Helios defaults unless the user or data requires a mode/projection/layout override.

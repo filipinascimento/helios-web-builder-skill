@@ -12,20 +12,22 @@ Use this skill to build a complete standalone Helios web visualization, not just
 1. Identify the data source and app type:
    - Static embedding or map with coordinates: read `references/data-loading.md` and `references/helios-api-recipes.md`.
    - General network layout: read `references/helios-api-recipes.md`.
+   - Remote search/download app: read `references/remote-query-apps.md`.
    - Netzschleuder or `.gt.zst`: read `references/netzschleuder.md`.
    - Rich UI with panels, filters, hover cards, density, or search: read `references/interface-and-design.md`.
 2. Choose the starter:
    - Use `assets/vite-standalone-template/` for a small static visualization or a smoke-test app.
    - Use `assets/analytics-interface-template/` when the app needs search, filters, multiple panels, quick controls, density toggles, or a richer analytical interface.
    - Copy selected helpers from `assets/interface-snippets/` when adapting an existing app.
-3. If exact Helios behavior is unclear, clone the current `helios-web` main branch into a scratch reference directory:
+3. Clone or update the current `helios-web` main branch into a scratch reference directory before overriding runtime defaults or recreating Helios behavior:
 
 ```bash
 bash scripts/clone-helios-web-reference.sh /tmp/helios-web-reference
 ```
 
+   This is required when touching layout, quick controls, camera mode, projection, renderer, panel behavior, filters, ranges, mappers, or persistence/session behavior unless the user explicitly says not to.
 4. Build with the published packages by default. Use local links only when the user explicitly wants to test unpublished Helios changes.
-5. Verify with at least `npm install` and `npm run build`. For UI work, run the dev server and inspect the rendered page in a browser.
+5. Verify with at least `npm install` and `npm run build`. For UI work or remote-query apps, run the dev server and inspect the rendered page in a browser before the interface becomes complex.
 
 ## Project Shape
 
@@ -104,11 +106,13 @@ When using WASM-backed buffers, do allocation-prone work before taking views and
 
 ## Scene Decisions
 
-- Embedding/map apps: set `mode: '2d'`, `projection: 'orthographic'`, `layout: { type: 'static' }`, then copy the coordinate attribute into a 3-component float visual position attribute if needed.
-- General graph apps: use `layout: { type: 'gpu-force', options: { mode: '2d' or '3d' } }`; avoid pinning renderer unless the task requires WebGPU-only behavior.
+- Preserve Helios defaults unless the user or data requires an override. Do not pin mode, projection, renderer, layout backend, or layout options just because the app is a graph.
+- Embedding/map apps with trusted coordinates may set `mode: '2d'`, `projection: 'orthographic'`, and `layout: { type: 'static' }`; document that this is an intentional coordinate-preserving override.
+- General graph apps should start from Helios defaults first. Add explicit layout/mode/projection only after checking the current `helios-web` source or when exposing user-selectable controls.
 - Large remote networks: confirm before loading very large files, use modest node/edge opacity, disable expensive labels by default, and expose controls gradually.
 - Rich analytic maps: use density surfaces, categorical legends, range controls, and search/filter panels. Keep the canvas full-screen and panels compact.
 - Relationship-heavy or multiplex apps: use collapsed filter sections, edge relationship checklists, quick fit/pause/info controls, and separate "show/hide" from "emphasize" controls so users can inspect edge families without constantly rebuilding layout state.
+- Query/demo apps should not show artificial intro graphs. Start empty, or use a clearly real default query when the user asks for one.
 
 ## UI Defaults
 
@@ -118,6 +122,7 @@ Standalone apps should feel like tools:
 - A small status line using `#viewer::before { content: attr(data-status); }`.
 - Compact panels created through `HeliosUI`, usually docked top-right for view controls and top-left for dataset browsing.
 - Search boxes, selects, range sliders, checklists, segmented controls, and hover cards as needed.
+- Use built-in Helios controls and UI primitives before creating custom controls. Fit, pause/resume, zoom, standard layout controls, filters, two-handle ranges, mapper controls, and domain editors should come from `helios-web` when available.
 - Avoid landing pages. The first screen should be the visualization.
 
 See `references/interface-and-design.md` for reusable UI patterns and CSS notes from the existing standalone apps.
@@ -154,6 +159,7 @@ Then inspect with a browser, confirm the canvas is nonblank, confirm the status 
 - `references/data-loading.md`: XNET, ZXNET JSON, raw XNET JSON, programmatic demo data, converters.
 - `references/helios-api-recipes.md`: Helios initialization, mappers, positions, density, filters, replacement.
 - `references/interface-and-design.md`: compact UI and CSS patterns from standalone apps.
+- `references/remote-query-apps.md`: remote API probing, empty startup state, caps, progress, cancellation.
 - `references/netzschleuder.md`: remote API, Vite proxy, `.gt.zst`, large-network guards.
 - `references/case-notes.md`: discoveries from `standalone_visualizations_helios_web_0_10_6`.
 - `references/verification.md`: build, browser checks, troubleshooting.
@@ -168,5 +174,7 @@ Then inspect with a browser, confirm the canvas is nonblank, confirm the status 
 - The first rendered screen is the visualization.
 - Data loading errors are surfaced in the page and console.
 - Browser verification was done for UI or renderer changes.
+- Remote APIs were probed live before tests locked down request parameters.
+- Completion notes state whether Helios defaults were preserved or which runtime defaults were intentionally overridden.
 - README explains install, dev, build, data source, and deployment.
 - No parent-directory assumptions are required for the app to run.

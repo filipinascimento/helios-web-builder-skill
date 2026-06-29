@@ -25,6 +25,8 @@ npm run prepare:network
 npm run build
 ```
 
+Run `npm audit --omit=dev` for app runtime risk, and inspect full `npm audit` output before final delivery. Do not force upgrades unless they are compatible with the target Node version and Helios package versions.
+
 ## Browser Checks
 
 Run:
@@ -43,6 +45,10 @@ Open the local URL and verify:
 - Search/filter controls visibly affect the scene.
 - Density and legend controls update if implemented.
 - The app still works after a reload.
+- Persistence/session prompts do not appear unless the user asked for save/restore behavior.
+- Built-in Helios controls handle fit, zoom, and pause/resume when available.
+
+For remote-query apps, run this browser check as soon as search/download/rendering are connected, before the UI grows complex. Verify the real API parameters, autocomplete, pagination, progress, cancellation, and cap handling in the browser.
 
 ## Common Failures
 
@@ -66,6 +72,7 @@ Check:
 - The graph has nodes.
 - For static layout, position attribute was applied and `requestFrameNetwork()` was called.
 - Node opacity/size are not zero.
+- A remote-query app is not still waiting in an empty state without a visible instruction or search control.
 
 ### Static embedding appears wrong
 
@@ -88,3 +95,16 @@ Add a size confirmation, reduce opacity, disable hover labels by default, reduce
 ### Panels overlap or text clips
 
 Constrain widths, set `min-width: 0`, use fixed panel heights for browsers/lists, apply `overflow: hidden`, and use `text-overflow: ellipsis` for labels.
+
+### Browser asks about unsaved changes
+
+Standalone query/demo apps should be persistence-free unless the user asks for sessions:
+
+```js
+new Helios(network, {
+  container: viewer,
+  storage: false,
+  session: false,
+  warnOnUnsavedChanges: false,
+});
+```

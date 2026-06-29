@@ -103,6 +103,8 @@ network.nodeAttribute('Group', (_value, id) => (id % 3 === 0 ? 'Alpha' : id % 3 
 });
 ```
 
+Do not use programmatic demo data as the startup graph for a remote-query tool. For live search/download apps, start from an empty ready state or a real default query requested by the user.
+
 ## Multiplex CSV Template
 
 For relationship-heavy apps like the multiplex reference, a practical intermediate format is:

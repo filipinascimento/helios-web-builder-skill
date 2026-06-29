@@ -12,11 +12,13 @@ All apps are Vite ESM projects with:
 - `package.json`
 - `vite.config.js`
 
-Most used:
+Original reference apps used:
 
 - `helios-network` around `^0.10.2` to `^0.10.3`
 - `helios-web` around `^0.10.6` to `^0.10.7`
 - `vite` `^5.4.10`
+
+For new scaffolds, check current registry versions instead of copying these historical package ranges.
 
 Every Vite config aliased `helios-web` to `./node_modules/helios-web/src/index.js` and excluded `helios-network` plus `helios-web` from `optimizeDeps`.
 

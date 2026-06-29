@@ -135,7 +135,12 @@ async function bootstrap() {
   const helios = new Helios(network, {
     container: viewer,
     ui: false,
-    quickControls: false,
+    quickControls: true,
+    storage: false,
+    session: false,
+    warnOnUnsavedChanges: false,
+    // This starter has fixed generated coordinates, so static 2D is intentional.
+    // For real graph-layout apps, omit these overrides unless the user asks.
     mode: '2d',
     projection: 'orthographic',
     layout: { type: 'static' },
