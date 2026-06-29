@@ -1,0 +1,4 @@
+interface:
+  display_name: "Helios Web Builder"
+  short_description: "Build standalone Helios web visualizations"
+  default_prompt: "Use $helios-web-builder-skill to build a standalone Helios web visualization from my network or embedding data."

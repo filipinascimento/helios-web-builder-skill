@@ -1,0 +1,134 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  color-scheme: dark;
+  font-family: "IBM Plex Sans", "Avenir Next", "Segoe UI", sans-serif;
+  background: #07101c;
+  color: #eef5ff;
+}
+
+html,
+body,
+#app,
+#viewer {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow: hidden;
+  background: #07101c;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+#app {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+}
+
+#viewer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+#viewer::before {
+  content: attr(data-status);
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  z-index: 10;
+  max-width: min(520px, calc(100vw - 2rem));
+  padding: 0.46rem 0.62rem;
+  border: 1px solid rgba(150, 170, 200, 0.32);
+  border-radius: 6px;
+  background: rgba(8, 15, 26, 0.82);
+  color: #eaf2ff;
+  font-size: 0.78rem;
+  pointer-events: none;
+}
+
+#viewer[data-status="Ready"]::before,
+#viewer[data-status=""]::before {
+  opacity: 0;
+}
+
+.app-panel {
+  display: grid;
+  gap: 0.72rem;
+  min-width: 0;
+}
+
+.app-panel__intro {
+  margin: 0;
+  color: color-mix(in srgb, var(--helios-ui-fg, currentColor) 76%, transparent);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.app-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.app-stat {
+  min-width: 0;
+  padding: 0.62rem 0.68rem;
+  border: 1px solid color-mix(in srgb, var(--helios-ui-border, currentColor) 70%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--helios-ui-bg, #111827) 72%, transparent);
+}
+
+.app-stat span {
+  display: block;
+  color: color-mix(in srgb, var(--helios-ui-fg, currentColor) 68%, transparent);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.app-stat strong {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 1.18rem;
+}
+
+.hover-card {
+  position: absolute;
+  left: 18px;
+  bottom: 18px;
+  z-index: 8;
+  width: min(360px, calc(100vw - 2rem));
+  padding: 0.82rem 0.9rem;
+  border: 1px solid rgba(121, 152, 190, 0.26);
+  border-radius: 8px;
+  background: rgba(7, 15, 27, 0.76);
+  backdrop-filter: blur(16px);
+}
+
+.hover-card.is-empty {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hover-card__title {
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.hover-card__meta {
+  margin-top: 0.3rem;
+  color: rgba(223, 233, 247, 0.8);
+  font-size: 0.82rem;
+  line-height: 1.42;
+}
